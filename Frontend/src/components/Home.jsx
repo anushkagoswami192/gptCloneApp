@@ -17,18 +17,17 @@ function Home() {
   const [chatId, setChatId] = useState("")
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/chat', {
+    fetch('https://gptcloneapp.onrender.com/api/chat', {
       method: 'GET',
       credentials: 'include'
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("data--", data.chats)
         setPreviousChats(data.chats.reverse())
       })
       .catch((err) => console.log(err))
 
-    const tempSocket = io("http://localhost:3000", {
+    const tempSocket = io("https://gptcloneapp.onrender.com", {
       withCredentials: true
     })
 
@@ -51,14 +50,12 @@ function Home() {
       })
     })
 
-    // 🔹 Final full response
     tempSocket.on("aiResponse", (message) => {
-      console.log("Final AI Response:", message)
+      
     })
 
     setSocket(tempSocket)
 
-    // cleanup when component unmounts
     return () => {
       tempSocket.disconnect()
     }
@@ -66,8 +63,7 @@ function Home() {
 
 
   async function loadPreviousChats(chatId) {
-    console.log("chat id---", chatId)
-    let response = await fetch(`http://localhost:3000/api/chat/${chatId}`, {
+    let response = await fetch(`https://gptcloneapp.onrender.com/api/chat/${chatId}`, {
       method: 'GET',
       credentials: 'include'
     })
@@ -79,8 +75,8 @@ function Home() {
         return {
           ...msg,
           sender: "user",
-          message: msg.message,  // user ke liye message field
-          content: undefined     // content ko clear kar do
+          message: msg.message, 
+          content: undefined     
         }
       } else {
         return {
@@ -92,17 +88,14 @@ function Home() {
       }
 
     })
-    console.log("normalizeMessages--", normalizeMessages)
     setMessages(normalizeMessages)
 
   }
   async function handleNewChat() {
-    // const title = window.prompt("Enter the title for new chat")
 
-    // console.log(title)
     if (!newChatTitle.trim()) return
 
-    const response = await fetch("http://localhost:3000/api/chat", {
+    const response = await fetch("https://gptcloneapp.onrender.com/api/chat", {
       method: 'POST',
       body: JSON.stringify({
         title: newChatTitle
@@ -115,29 +108,26 @@ function Home() {
 
     const data = await response.json();
     setChatId(data.chat._id)
-    console.log("data", data.chat._id)
     setPreviousChats((prev) => [data.chat, ...prev])
     setNewChatTitle("")
     setIsModalOpen(false)
   }
 
 
-  // Handle sending a message
   const handleSend = async (e) => {
     e.preventDefault()
-
-   
 
     if (!userInput.trim()) return
 
     let currentChatId = chatId;
 
-    // 🔹 Agar pehle se koi chatId nahi hai, to naya chat banao
     if (!currentChatId) {
-      const response = await fetch("http://localhost:3000/api/chat", {
+      const response = await fetch("https://gptcloneapp.onrender.com/api/chat", {
         method: 'POST',
         body: JSON.stringify({ title: userInput.slice(0, 20) || "New Chat" }),
         headers: { "content-Type": "application/json" },
+
+
         credentials: 'include'
       })
       const data = await response.json()
@@ -148,22 +138,17 @@ function Home() {
 
 
     const newMessage = { chat: currentChatId, message: userInput }
-    console.log("newMessage--", newMessage)
-    console.log("newMessage--", messages)
     setMessages((prev) => [...prev, { chat: currentChatId, message: userInput, sender: 'user' }])
     socket.emit("user-message", newMessage)
     setUserInput('')
     setLoading(true)
   }
 
-  console.log("previousChats--", previousChats)
   const toggleSidebar = () => setSidebarOpen((open) => !open)
 
   return (
     <div className="home-wrapper">
-      {/* Sidebar overlay for mobile */}
       {sidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
-      {/* Sidebar */}
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <h2>Chats</h2>
@@ -174,10 +159,10 @@ function Home() {
           {previousChats.length === 0 ? (<li className="empty">No previous chats</li>) : (previousChats.map((chat, idx) => <li onClick={() => loadPreviousChats(chat._id)} key={idx}>{chat.title}</li>))}
         </ul>
       </aside>
-      {/* Chat screen */}
+
       <main className="chat-main">
         <div className="chat-header">
-          {/* Menu button for mobile */}
+       
           <button className="menu-btn" onClick={toggleSidebar}>
             <span className="menu-icon">&#9776;</span>
           </button>

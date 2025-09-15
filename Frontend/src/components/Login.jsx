@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
    setSubmitting(true)
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch('https://gptcloneapp.onrender.com/api/auth/login', {
         method: "POST",
         headers: {
           "content-Type": "application/json"
@@ -32,7 +32,6 @@ const Login = () => {
         setModalMessage(errData.message || "Registration failed. Try again.");
          return
       }
-      console.log(data)
       navigate('/')
      
     } catch(err){

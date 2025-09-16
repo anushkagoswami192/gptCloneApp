@@ -263,6 +263,7 @@
   color: #fff;
 }
 
+
 .menu-btn {
   background: none;
   border: none;
@@ -401,4 +402,21 @@
   .menu-btn {
     display: none;
   }
+   .chat-header {
+    background: transparent; /* no background on mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-header {
+    background: transparent; /* no background on mobile */
+  }
+  .menu-btn {
+    padding: 0;
+  }
+  .empty-chat{
+    background-color: transparent;
+    width: 100%;
+  }
+ 
 }

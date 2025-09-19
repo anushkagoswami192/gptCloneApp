@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './Home.css'
 import { io } from 'socket.io-client'
 import ReactMarkdown from "react-markdown";
@@ -15,6 +15,7 @@ function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newChatTitle, setNewChatTitle] = useState("")
   const [chatId, setChatId] = useState("")
+  const chatMessagesRef = useRef(null)
 
   useEffect(() => {
     fetch('https://gptcloneapp.onrender.com/api/chat', {
@@ -60,6 +61,13 @@ function Home() {
       tempSocket.disconnect()
     }
   }, [])
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight
+    }
+  }, [messages, loading])
 
 
   async function loadPreviousChats(chatId) {
@@ -168,7 +176,11 @@ function Home() {
           </button>
           <h2>Let’s Talk 🚀</h2>
         </div>
-        <div className={messages.length === 0 ? "chat-messages-empty" : "chat-messages"}>
+        <div
+          ref={chatMessagesRef}
+          className={messages.length === 0 ? "chat-messages-empty" : "chat-messages"}
+          style={{ overflowY: 'auto', maxHeight: '100%' }}
+        >
           {messages.length === 0 ? (
             <div className="empty-chat">
               <h1 className="headingClone">GPT Clone</h1>
